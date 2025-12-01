@@ -32,7 +32,7 @@ const Row = ({ title, fetchUrl, isLargeRow = false }) => {
           const urlParams = new URLSearchParams(new URL(url).search);
           setTrailerUrl(urlParams.get("v"));
         })
-        .catch(gi(error) => console.error("Trailer Error:", error));
+        .catch((error) => console.error("Trailer Error:", error));
     }
   };
 
