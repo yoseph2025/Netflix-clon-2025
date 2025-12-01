@@ -1,4 +1,4 @@
-gitimport { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Banner.css";
 
 const Banner = () => {
