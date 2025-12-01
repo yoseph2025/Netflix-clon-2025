@@ -1,51 +1,58 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./Banner.css";
 
 const Banner = () => {
-  const [videos, setVideos] = useState([]);
+  const [movie, setMovie] = useState(null);
 
-  const API_KEY = "AIzaSyBewKP0F5b4PztkV6kGCGBiq6L6Swq-L2I";
-  const CHANNEL_ID = "UCVls1GmFKf6WlTraIb_IaJg";
-  const MAX_RESULTS = 8;
+  const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
   useEffect(() => {
-    const fetchVideos = async () => {
-      const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&maxResults=${MAX_RESULTS}&order=viewCount&type=video&key=${API_KEY}`;
+    const fetchBanner = async () => {
       try {
-        const res = await fetch(url);
-        const data = await res.json();
-        setVideos(data.items);
+        const response = await fetch(
+          `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_networks=213`
+        );
+
+        const data = await response.json();
+        setMovie(data.results[Math.floor(Math.random() * data.results.length)]);
       } catch (error) {
-        console.error("Error fetching YouTube videos:", error);
+        console.error("Banner Fetch Error:", error);
       }
     };
 
-    fetchVideos();
-  }, []);
+    fetchBanner();
+  }, [API_KEY]);
 
   return (
-    <div className="netflix-section">
-      <h2 className="netflix-title">Apple Official Videos</h2>
+    <header
+      className="banner"
+      style={{
+        backgroundSize: "cover",
+        backgroundImage: movie
+          ? `url("https://image.tmdb.org/t/p/original/${movie.backdrop_path}")`
+          : "none",
+        backgroundPosition: "center center",
+      }}
+    >
+      <div className="banner-contents">
+        <h1 className="banner-title">
+          {movie?.name || movie?.title || movie?.original_name}
+        </h1>
 
-      <div className="netflix-row">
-        {videos.map((video) => (
-          <div key={video.id.videoId} className="netflix-card">
-            <img
-              className="netflix-thumbnail"
-              src={video.snippet.thumbnails.high.url}
-              alt={video.snippet.title}
-            />
-            <div className="netflix-overlay">
-              <h3>{video.snippet.title}</h3>
-              <p>{video.snippet.description}</p>
-              <span>
-                {new Date(video.snippet.publishedAt).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-        ))}
+        <div className="banner-buttons">
+          <button className="banner-button">Play</button>
+          <button className="banner-button">My List</button>
+        </div>
+
+        <p className="banner-description">
+          {movie?.overview?.length > 150
+            ? movie.overview.substring(0, 150) + "..."
+            : movie?.overview}
+        </p>
       </div>
-    </div>
+
+      <div className="banner-fadeBottom"></div>
+    </header>
   );
 };
 
